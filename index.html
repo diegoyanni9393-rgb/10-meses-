@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Nuestra Historia</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background:black;
+    color:white;
+    overflow:hidden;
+    text-align:center;
+}
+canvas#stars{
+    position:fixed;
+    top:0;left:0;
+    z-index:-1;
+}
+.container{
+    max-width:600px;
+    margin:auto;
+    padding:20px;
+}
+button{
+    padding:12px 25px;
+    background:#ff4d6d;
+    border:none;
+    color:white;
+    border-radius:10px;
+    cursor:pointer;
+    animation:pulse 1.5s infinite;
+}
+@keyframes pulse{
+    0%{transform:scale(1);}
+    50%{transform:scale(1.1);}
+    100%{transform:scale(1);}
+}
+#game{background:#111;}
+#tetris{display:none;}
+#carta{
+    display:none;
+    height:80vh;
+    overflow-y:auto;
+    text-align:left;
+    padding:20px;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="stars"></canvas>
+
+<audio id="music" loop>
+<source src="musica.mp3" type="audio/mpeg">
+</audio>
+
+<div class="container" id="app"></div>
+
+<div id="tetris">
+<canvas id="game" width="240" height="400"></canvas>
+<p id="score">Puntaje: 0</p>
+</div>
+
+<div id="carta"></div>
+
+<script>
+/* 🌌 estrellas */
+const starCanvas=document.getElementById("stars");
+const sctx=starCanvas.getContext("2d");
+starCanvas.width=innerWidth;
+starCanvas.height=innerHeight;
+let stars=Array(100).fill().map(()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight}));
+function drawStars(){
+    sctx.clearRect(0,0,innerWidth,innerHeight);
+    stars.forEach(s=>{
+        sctx.fillRect(s.x,s.y,2,2);
+        s.y+=0.3;
+        if(s.y>innerHeight)s.y=0;
+    });
+    requestAnimationFrame(drawStars);
+}
+drawStars();
+
+/* 🎵 música */
+function playMusic(){
+    document.getElementById("music").play();
+}
+
+/* 🧠 historia */
+let step=0;
+
+function render(){
+const app=document.getElementById("app");
+
+if(step===0){
+app.innerHTML=`
+<img src="foto_inicio.jpg" style="width:100%;border-radius:10px;">
+<h1>Hola mi vida ❤️</h1>
+<button onclick="next()">Continuar</button>`;
+}
+
+if(step===1){
+app.innerHTML=`<p>Primero... un poquito de juego uwu</p>
+<button onclick="next()">Jugar</button>`;
+}
+
+if(step===2){
+app.style.display="none";
+document.getElementById("tetris").style.display="block";
+startGame();
+playMusic();
+}
+
+if(step===3){
+document.getElementById("tetris").style.display="none";
+app.style.display="block";
+app.innerHTML=`<h2 id="msg"></h2>
+<button onclick="next()">Seguir</button>`;
+}
+
+if(step===4){
+app.innerHTML=`<p>Ahora quiero que leas esta pequeña carta mi vida</p>
+<button onclick="next()">Leer</button>`;
+}
+
+if(step===5){
+app.style.display="none";
+let carta=document.getElementById("carta");
+carta.style.display="block";
+carta.innerText=`Mi vida, mi amor, mi compañera de todas... hoy se cumplen 9 meses y, sinceramente, me puse a pensar en todo lo que hemos pasado y sentí que un mensaje corto no alcanzaba para decirte ni la mitad de lo que tengo guardado acá adentro. Necesitaba sentarme a escribirte esto, algo que de verdad pudieras leer y releer cuando quieras, porque estos ocho meses han sido, sin duda, los mejores de mi vida. A veces me pongo a pensar en cómo era todo antes de que estuviéramos juntos y me cuesta acordarme, porque ahora vos sos el centro de todo lo lindo que me pasa.
+
+Lo primero que se me viene a la mente, y que me hace sonreír solo de pensarlo, es lo increíble que cocinás. Es algo que me vuela la cabeza siempre, de verdad. Ya sean esos brownies que te quedan con el punto justo, con ese olorcito que inunda todo, o cuando hacés fideos con tuco... amor, te lo digo totalmente en serio: cocinás tan bien como un ángel que se escapó del mismísimo Jardín del Edén. A veces te miro ahí concentrada, manejando las ollas y los ingredientes con tanta naturalidad, y pienso que si los ángeles supieran lo que preparás, bajarían del cielo solo para pedirte la receta o para probar aunque sea un bocado. Pero al final el bendecido soy yo. Yo soy el que tiene la suerte inmensa de poder sentarse a la mesa y comer lo que vos hacés con tanto cariño y dedicación. No es solo el sabor, que es de otro mundo, es el hecho de saber que te tomaste el tiempo de preparar algo para mí, y eso hace que cada plato sea la mejor comida que probé en mi vida. Me siento un privilegiado total cada vez que compartimos una comida y sé que ese talento salió de tus manos. Es como si me estuvieras cuidando a través de lo que cocinás, y eso es algo que valoro más de lo que te imaginás.
+
+Y hablando de momentos que guardo como tesoros, no sabés la paz inmensa que me da cuando nos vamos al Jardín Botánico. Esos ratos ahí, con vos, son mi cable a tierra absoluto. Estar bajo un árbol, sintiendo el pasto, el aire fresco en la cara y, sobre todo, tu presencia al lado mío, es lo más agradable que me puede pasar en el día. Es como si el mundo de afuera se apagara por un rato; como si estuviéramos en nuestra propia burbuja donde no entra nada malo, ni los problemas, ni el ruido de la calle, ni el estrés de las clases o de cualquier cosa que nos esté preocupando. Estar a tu lado así, tan tranquilos, alejados de todo el caos, es lo que me hace dar cuenta de que no necesito grandes lujos ni cosas materiales para ser el tipo más feliz del planeta. Solo te necesito a vos, un lugar verde y ese silencio compartido que nunca me resulta incómodo. Esos paseos son los que me llenan el alma y me hacen sentir que, mientras estemos juntos, todo va a estar bien.
+
+Sos tan buena conmigo que a veces me quedo mudo tratando de entender cómo tuve tanta suerte. Tus detalles, esos regalos hermosos que siempre encontrás la forma de hacerme, y algo que de verdad me llega al corazón: que me traigas la merienda al liceo. Sé que para muchos pueden ser solo unos minutos en un recreo, que pasan volando y que enseguida suena la campana y tenemos que volver a encerrarnos en el salón, pero para mí esos 5 o 10 minutos son el momento más importante de todo el día. Me encuentro contando cada segundo, cada milisegundo que puedo pasar con vos ahí en el patio o en los pasillos. Esos ratitos cortos, que para otros pueden parecer nada, para mí son el combustible que necesito para terminar la jornada con una sonrisa. Cuando te veo llegar con algo para mí, no veo solo comida o un detalle, veo a la persona que más quiero en el mundo preocupándose por mí, y eso me hace sentir cuidado y amado como nunca antes. Sos pura generosidad y dulzura, y quiero que sepas que no se me pasa por alto ni un solo gesto de los que tenés conmigo; los guardo todos acá adentro.
+
+Es increíble lo agradable que es hacer absolutamente cualquier cosa con vos, no importa qué tan simple sea el plan. Podemos estar haciendo los deberes más aburridos o simplemente caminando sin rumbo, pero si estás vos, todo se transforma en algo especial. Y tengo que decírtelo mil veces si es necesario, aunque a veces te dé vergüenza: sos hermosa. Tenés una belleza que, te juro, es envidiada por la luna. Ella necesita que se haga de noche para poder brillar un poquito, pero vos iluminás todo a cualquier hora del día con solo una mirada o con esa sonrisa que tenés. Me quedo mirándote a veces, así de la nada, y me pierdo pensando en lo afortunado que soy de que seas mi novia. Tu belleza no es solo lo que se ve por fuera, que ya es demasiado, sino esa forma de ser que tenés que hace que todo a tu alrededor sea más lindo.
+
+Pero más allá de lo bien que la pasamos, quería aprovechar estos ocho meses para decirte lo que realmente sueño con vos, porque esto que tenemos va muy en serio para mí. Mi deseo más profundo, el que visualizo casi todas las noches antes de dormir, es el de casarme con vos algún día y hacer toda una vida a tu lado. Sé perfectamente que no he sido perfecto en este tiempo. Soy plenamente consciente de que he cometido errores, de que he hecho mis cagadas y que hubo momentos en los que quizás no estuve a la altura de lo que una mujer como vos merece. Me duele pensar en las veces que fallé, pero te juro que mi intención es siempre ir para adelante con vos. Me encantaría que algún día decidas casarte conmigo, que te canses de todo pero que elijas quedarte conmigo siempre, y que formemos ese hogar que a veces imaginamos entre risas. Quiero compartir cada uno de mis días con vos, desde los más felices hasta los más difíciles. Quiero cumplir nuestros objetivos de la mano, ver cómo crecés, cómo lográs tus metas y estar ahí para ser el primero en aplaudirte.
+
+Me hace inmensamente feliz ver todo lo que te esforzás y ver tu rendimiento en todo lo que hacés; me llena de un orgullo que no me cabe en el pecho ver la persona en la que te estás convirtiendo. Sé que a veces tenemos problemas y que la vida nos pone obstáculos, pero tengo la certeza absoluta de que vamos a estar cada vez mejor. Vamos a ir mejorando con el paso del tiempo, aprendiendo el uno del otro, puliendo esas cosas que nos cuestan y fortaleciendo nuestro vínculo. Lo que siento por vos es mucho más fuerte que cualquier pelea o cualquier malentendido, y estoy dispuesto a darlo todo para que esto siga creciendo.
+
+Me encanta la complicidad que tenemos, incluso en las cosas que podrían parecer tonterías para los demás. Lo lindo que es ponernos a jugar Roblox juntos, reírnos de las situaciones absurdas que pasan en los juegos o competir por cualquier pavada. O esas tardes mirando anime, donde nos perdemos en las historias y comentamos cada capítulo como si fuéramos expertos. Son esos momentos de juego y de risa pura los que hacen que nuestra relación sea tan auténtica y que me sienta tan cómodo con vos. También disfruto muchísimo algo tan simple como escuchar música con vos. Ya sea en el bondi, compartiendo un auricular cada uno mientras miramos por la ventana y la ciudad pasa de largo, o cuando nos sentamos en el Botánico y ponemos algo bajito de fondo para acompañar nuestra charla. La música con vos suena distinta, las letras parecen hablar de nosotros y los ritmos se sienten más alegres. Me encanta conocer tus gustos y que vos conozcas los míos, ir armando nuestra propia banda sonora de estos ocho meses.
+
+Gracias por este tiempo, mi reina. Gracias por no soltarme la mano en los momentos complicados, por cocinarme con ese amor que solo vos tenés, por esos recreos salvadores en el liceo y por ser, sencillamente, la persona más increíble que se cruzó en mi camino. Prometo seguir intentando ser el hombre que te merecés, esforzarme cada día por sacarte una sonrisa y cuidar esto que tenemos como si fuera el tesoro más grande del mundo, porque para mí lo es. Vamos por muchísimos meses más, por más meriendas compartidas, por más paseos bajo los árboles y por esa vida entera que tanto sueño con vos.
+
+Te amo con todo mi corazón, hoy, mañana y para siempre. Felices 9 meses, amor de mi vida.`;
+}
+}
+
+function next(){
+step++;
+render();
+}
+
+/* TETRIS */
+const canvas=document.getElementById("game");
+const ctx=canvas.getContext("2d");
+const COLS=10, ROWS=20, SIZE=20;
+let board=Array.from({length:ROWS},()=>Array(COLS).fill(0));
+let piece, score=0, gameOver=false;
+
+const shapes=[
+[[1,1,1],[0,1,0]],
+[[1,1],[1,1]],
+[[1,1,0],[0,1,1]],
+[[0,1,1],[1,1,0]],
+[[1,1,1,1]]
+];
+
+function newPiece(){
+const shape=shapes[Math.floor(Math.random()*shapes.length)];
+return {x:3,y:0,shape};
+}
+
+function draw(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+board.forEach((row,y)=>{
+row.forEach((v,x)=>{
+if(v) ctx.fillRect(x*SIZE,y*SIZE,SIZE,SIZE);
+});
+});
+piece.shape.forEach((row,y)=>{
+row.forEach((v,x)=>{
+if(v) ctx.fillRect((piece.x+x)*SIZE,(piece.y+y)*SIZE,SIZE,SIZE);
+});
+});
+}
+
+function collide(){
+return piece.shape.some((row,y)=>
+row.some((v,x)=>{
+if(!v)return false;
+let nx=piece.x+x, ny=piece.y+y;
+return nx<0||nx>=COLS||ny>=ROWS||board[ny]?.[nx];
+})
+);
+}
+
+function merge(){
+piece.shape.forEach((row,y)=>{
+row.forEach((v,x)=>{
+if(v) board[piece.y+y][piece.x+x]=1;
+});
+});
+}
+
+function clearLines(){
+board=board.filter(row=>row.some(v=>!v));
+while(board.length<ROWS){
+board.unshift(Array(COLS).fill(0));
+score+=10;
+}
+document.getElementById("score").innerText="Puntaje: "+score;
+}
+
+function rotate(){
+let m=piece.shape;
+piece.shape=m[0].map((_,i)=>m.map(r=>r[i]).reverse());
+if(collide()) piece.shape=m;
+}
+
+function drop(){
+piece.y++;
+if(collide()){
+piece.y--;
+merge();
+clearLines();
+piece=newPiece();
+if(collide()){
+gameOver=true;
+endGame();
+}
+}
+}
+
+function move(dir){
+piece.x+=dir;
+if(collide()) piece.x-=dir;
+}
+
+document.addEventListener("keydown",e=>{
+if(gameOver)return;
+if(e.key==="ArrowLeft")move(-1);
+if(e.key==="ArrowRight")move(1);
+if(e.key==="ArrowDown")drop();
+if(e.key==="ArrowUp")rotate();
+});
+
+function loop(){
+if(gameOver)return;
+drop();
+draw();
+setTimeout(loop,500);
+}
+
+function startGame(){
+board=Array.from({length:ROWS},()=>Array(COLS).fill(0));
+piece=newPiece();
+score=0;
+gameOver=false;
+loop();
+}
+
+function endGame(){
+let msg=document.getElementById("msg");
+if(score>=100){
+msg.innerText="Sabía que podías hacerlo ❤️";
+}else{
+msg.innerText="No importa… igual me pareces la mejor mi niña ❤️";
+}
+step=3;
+render();
+}
+
+render();
+</script>
+
+</body>
+</html>
