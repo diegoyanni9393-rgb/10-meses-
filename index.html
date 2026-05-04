@@ -59,7 +59,7 @@ button{
 
 <div class="container" id="app"></div>
 
-<div id="tetris">
+<div id="tetris" style="display:none;">
     <div class="tetris-wrapper">
         
         <img src="foto_izq.jpg.jpeg" class="side-img">
@@ -137,7 +137,12 @@ app.innerHTML=`<p>Primero... un poquito de juego uwu</p>
 
 if(step===2){
 app.style.display="none";
-document.getElementById("tetris").style.display="block";
+
+let tetris = document.getElementById("tetris");
+tetris.style.display="block";
+
+console.log("Tetris activado");
+
 startGame();
 playMusic();
 }
