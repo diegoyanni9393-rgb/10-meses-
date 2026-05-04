@@ -85,7 +85,7 @@ button{
 <canvas id="stars"></canvas>
 
 <audio id="music" loop>
-<source src="musica.mp3" type="audio/mpeg">
+<source src="musica.mp3.mp3" type="audio/mpeg">
 </audio>
 
 <div class="container" id="app"></div>
@@ -94,14 +94,14 @@ button{
 <div id="tetris">
     <div class="tetris-wrapper">
 
-        <img src="foto_izq.jpg" class="side-img">
+        <img src="foto_izq.jpg.jpeg" class="side-img">
 
         <div>
             <canvas id="game" width="200" height="320"></canvas>
             <p id="score">Puntaje: 0</p>
         </div>
 
-        <img src="foto_der.jpg" class="side-img">
+        <img src="foto_der.jpg.jpeg" class="side-img">
 
     </div>
 </div>
@@ -151,7 +151,7 @@ const app=document.getElementById("app");
 
 if(step===0){
 app.innerHTML=`
-<img src="foto_inicio.jpg" style="width:100%; border-radius:10px;">
+<img src="foto_inicio.jpg.jpeg" style="width:100%; border-radius:10px;">
 <h1>Hola amor ❤️</h1>
 <button onclick="startExperience()">Continuar</button>`;
 }
@@ -234,33 +234,48 @@ function draw(){
     });
 }
 
-function collide(){
-return piece.shape.some((row,y)=>
-row.some((v,x)=>{
-if(!v)return false;
-let nx=piece.x+x, ny=piece.y+y;
-return nx<0||nx>=COLS||ny>=ROWS||board[ny]?.[nx];
-})
-);
+function drop(){
+    piece.y++;
+
+    if(collide()){
+        piece.y--; // vuelve atrás
+
+        merge();   // fija la pieza en el tablero
+        clearLines();
+
+        piece = newPiece();
+
+        // 👇 si ya choca al aparecer = game over
+        if(collide()){
+            gameOver = true;
+            endGame();
+            return;
+        }
+    }
 }
 
 function merge(){
     piece.shape.forEach((row,y)=>{
         row.forEach((v,x)=>{
             if(v){
-                board[piece.y+y][piece.x+x] = piece.color;
+                board[piece.y + y][piece.x + x] = piece.color;
             }
         });
     });
 }
 
 function clearLines(){
-board=board.filter(row=>row.some(v=>!v));
-while(board.length<ROWS){
-board.unshift(Array(COLS).fill(0));
-score+=10;
-}
-document.getElementById("score").innerText="Puntaje: "+score;
+    let newBoard = board.filter(row => row.some(cell => !cell));
+    let cleared = ROWS - newBoard.length;
+
+    while(newBoard.length < ROWS){
+        newBoard.unshift(Array(COLS).fill(0));
+    }
+
+    board = newBoard;
+    score += cleared * 10;
+
+    document.getElementById("score").innerText = "Puntaje: " + score;
 }
 
 function drop(){
@@ -290,10 +305,12 @@ if(e.key==="ArrowDown")drop();
 });
 
 function loop(){
-if(gameOver)return;
-drop();
-draw();
-setTimeout(loop,500);
+    if(gameOver) return;
+
+    drop();
+    draw();
+
+    setTimeout(loop, 500);
 }
 
 function startGame(){
