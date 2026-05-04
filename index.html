@@ -136,15 +136,14 @@ app.innerHTML=`<p>Primero... un poquito de juego uwu</p>
 }
 
 if(step===2){
-app.style.display="none";
+    app.style.display="none";
 
-let tetris = document.getElementById("tetris");
-tetris.style.display="block";
+    let tetris = document.getElementById("tetris");
+    tetris.style.display="block";
+    tetris.style.background = "red"; // 👈 prueba visual
 
-console.log("Tetris activado");
-
-startGame();
-playMusic();
+    startGame();
+    playMusic();
 }
 
 if(step===3){
