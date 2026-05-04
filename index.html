@@ -60,8 +60,18 @@ button{
 <div class="container" id="app"></div>
 
 <div id="tetris">
-<canvas id="game" width="240" height="400"></canvas>
-<p id="score">Puntaje: 0</p>
+    <div class="tetris-wrapper">
+        
+        <img src="foto_izq.jpg" class="side-img">
+
+        <div class="game-box">
+            <canvas id="game" width="240" height="400"></canvas>
+            <p id="score">Puntaje: 0</p>
+        </div>
+
+        <img src="foto_der.jpg" class="side-img">
+
+    </div>
 </div>
 
 <div id="carta"></div>
@@ -88,6 +98,10 @@ drawStars();
 function playMusic(){
     document.getElementById("music").play();
 }
+    function startExperience(){
+    playMusic();
+    next();
+}
 
 /* 🧠 historia */
 let step=0;
@@ -97,9 +111,9 @@ const app=document.getElementById("app");
 
 if(step===0){
 app.innerHTML=`
-<img src="foto_inicio.jpg" style="width:100%;border-radius:10px;">
-<h1>Hola mi vida ❤️</h1>
-<button onclick="next()">Continuar</button>`;
+<img src="foto_inicio.jpg" style="width:100%; border-radius:10px; margin-bottom:15px;">
+<h1>Hola amor ❤️</h1>
+<button onclick="startExperience()">Continuar</button>`;
 }
 
 if(step===1){
@@ -164,31 +178,40 @@ const COLS=10, ROWS=20, SIZE=20;
 let board=Array.from({length:ROWS},()=>Array(COLS).fill(0));
 let piece, score=0, gameOver=false;
 
-const shapes=[
-[[1,1,1],[0,1,0]],
-[[1,1],[1,1]],
-[[1,1,0],[0,1,1]],
-[[0,1,1],[1,1,0]],
-[[1,1,1,1]]
+const shapes = [
+    {shape:[[1,1,1],[0,1,0]], color:"purple"},
+    {shape:[[1,1],[1,1]], color:"yellow"},
+    {shape:[[1,1,0],[0,1,1]], color:"green"},
+    {shape:[[0,1,1],[1,1,0]], color:"red"},
+    {shape:[[1,1,1,1]], color:"cyan"}
 ];
 
 function newPiece(){
-const shape=shapes[Math.floor(Math.random()*shapes.length)];
-return {x:3,y:0,shape};
+    const p = shapes[Math.floor(Math.random()*shapes.length)];
+    return {x:3, y:0, shape:p.shape, color:p.color};
 }
 
 function draw(){
-ctx.clearRect(0,0,canvas.width,canvas.height);
-board.forEach((row,y)=>{
-row.forEach((v,x)=>{
-if(v) ctx.fillRect(x*SIZE,y*SIZE,SIZE,SIZE);
-});
-});
-piece.shape.forEach((row,y)=>{
-row.forEach((v,x)=>{
-if(v) ctx.fillRect((piece.x+x)*SIZE,(piece.y+y)*SIZE,SIZE,SIZE);
-});
-});
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    // tablero
+    board.forEach((row,y)=>{
+        row.forEach((cell,x)=>{
+            if(cell){
+                ctx.fillStyle = cell;
+                ctx.fillRect(x*SIZE,y*SIZE,SIZE,SIZE);
+            }
+        });
+    });
+
+    piece.shape.forEach((row,y)=>{
+        row.forEach((v,x)=>{
+            if(v){
+                ctx.fillStyle = piece.color;
+                ctx.fillRect((piece.x+x)*SIZE,(piece.y+y)*SIZE,SIZE,SIZE);
+            }
+        });
+    });
 }
 
 function collide(){
@@ -202,11 +225,13 @@ return nx<0||nx>=COLS||ny>=ROWS||board[ny]?.[nx];
 }
 
 function merge(){
-piece.shape.forEach((row,y)=>{
-row.forEach((v,x)=>{
-if(v) board[piece.y+y][piece.x+x]=1;
-});
-});
+    piece.shape.forEach((row,y)=>{
+        row.forEach((v,x)=>{
+            if(v){
+                board[piece.y+y][piece.x+x] = piece.color;
+            }
+        });
+    });
 }
 
 function clearLines(){
